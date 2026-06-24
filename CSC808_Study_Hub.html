@@ -1,0 +1,355 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CSC808 — Study Hub</title><style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:ital,wght@0,400;0,600&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap');
+:root{--ink:#1a1a2e;--paper:#f7f6f2;--rule:#d4cfc4;--accent:#2d4a8a;--accent-light:#e8edf7;
+--accent2:#8a2d2d;--accent2-light:#f7e8e8;--gold:#b5891a;--gold-light:#fdf4e0;--green:#1a6b3a;--green-light:#e6f4ec;
+--mono:'IBM Plex Mono',monospace;--serif:'IBM Plex Serif',Georgia,serif;--sans:'Inter',system-ui,sans-serif;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--paper);color:var(--ink);line-height:1.6;font-size:16px}
+.masthead{background:var(--ink);color:#fff;padding:1.6rem 1.5rem 0;text-align:center;border-bottom:4px solid var(--accent)}
+.masthead .eyebrow{font-family:var(--mono);font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:#a0a8c0}
+.masthead h1{font-family:var(--serif);font-size:clamp(1.3rem,4vw,2rem);font-weight:600;margin:.35rem 0 .1rem}
+.masthead .brand{font-family:var(--mono);font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:.9rem}
+.tabs{display:flex;justify-content:center;gap:.2rem;flex-wrap:wrap}
+.tab{font-family:var(--mono);font-size:.74rem;letter-spacing:.05em;color:#cdd6ea;background:transparent;border:none;border-bottom:3px solid transparent;padding:.6rem 1rem;cursor:pointer;text-transform:uppercase}
+.tab:hover{color:#fff}.tab.active{color:#fff;border-bottom-color:var(--gold)}
+.wrap{max-width:760px;margin:0 auto;padding:1.4rem 1.1rem 4rem}
+.view{display:none}.view.active{display:block}
+.bar{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem}
+.chip{font-family:var(--mono);font-size:.66rem;letter-spacing:.04em;border:1px solid var(--rule);background:#fff;color:var(--ink);border-radius:999px;padding:.28rem .7rem;cursor:pointer}
+.chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.spacer{flex:1}
+.stat{font-family:var(--mono);font-size:.7rem;color:#777}
+.btn{font-family:var(--sans);font-weight:600;font-size:.9rem;border:none;border-radius:5px;padding:.6rem 1.1rem;cursor:pointer;background:var(--accent);color:#fff}
+.btn:hover{filter:brightness(1.07)}.btn.ghost{background:#fff;color:var(--accent);border:1px solid var(--accent)}
+.btn.gold{background:var(--gold)}.btn.green{background:var(--green)}.btn.red{background:var(--accent2)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-top:1rem}
+/* flashcard */
+.fc{perspective:1400px;margin:.4rem 0 1rem}
+.fc-inner{position:relative;min-height:240px;transition:transform .5s;transform-style:preserve-3d;cursor:pointer}
+.fc.flip .fc-inner{transform:rotateY(180deg)}
+.fc-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:8px;border:1px solid var(--rule);padding:1.6rem;display:flex;flex-direction:column;justify-content:center;background:#fff}
+.fc-front{background:var(--ink);color:#fff}
+.fc-front .lbl,.fc-back .lbl{font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;margin-bottom:.7rem}
+.fc-front .lbl{color:#6f86c0}.fc-back .lbl{color:var(--accent)}
+.fc-front .body{font-family:var(--serif);font-size:1.3rem;font-weight:600;line-height:1.3}
+.fc-back{transform:rotateY(180deg);background:var(--accent-light)}
+.fc-back .body{font-size:.98rem}
+.fc-hint{text-align:center;font-family:var(--mono);font-size:.64rem;color:#999;letter-spacing:.08em}
+.progress{height:8px;border-radius:6px;background:#e6e2d8;overflow:hidden;margin:.5rem 0}
+.progress>span{display:block;height:100%;background:var(--green);width:0%}
+/* mcq */
+.qcard{background:#fff;border:1px solid var(--rule);border-radius:8px;padding:1.2rem 1.3rem;margin-bottom:1rem}
+.qmeta{font-family:var(--mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.55rem}
+.qtext{font-family:var(--serif);font-size:1.12rem;font-weight:600;margin-bottom:.9rem;line-height:1.35}
+.opt{display:block;width:100%;text-align:left;background:#fff;border:1px solid var(--rule);border-radius:6px;padding:.7rem .9rem;margin-bottom:.5rem;cursor:pointer;font-size:.95rem}
+.opt:hover{border-color:var(--accent);background:var(--accent-light)}
+.opt.correct{background:var(--green-light);border-color:var(--green)}
+.opt.wrong{background:var(--accent2-light);border-color:var(--accent2)}
+.opt.dim{opacity:.6}
+.exp{font-size:.88rem;background:var(--gold-light);border-left:3px solid var(--gold);border-radius:4px;padding:.65rem .85rem;margin-top:.4rem}
+.exp .lbl{font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:.2rem}
+/* exam */
+.palette{display:grid;grid-template-columns:repeat(10,1fr);gap:.32rem;margin:.8rem 0}
+.pcell{font-family:var(--mono);font-size:.7rem;border:1px solid var(--rule);background:#fff;border-radius:4px;padding:.4rem 0;text-align:center;cursor:pointer}
+.pcell.answered{background:var(--accent);color:#fff;border-color:var(--accent)}
+.pcell.flagged{outline:2px solid var(--gold)}
+.pcell.current{box-shadow:0 0 0 2px var(--ink)}
+.timer{font-family:var(--mono);font-weight:500;font-size:1.05rem;padding:.3rem .7rem;border-radius:5px;background:var(--ink);color:#7dd3b0}
+.timer.warn{color:#ffd27d}.timer.crit{color:#ff9b9b}
+.saq-input{width:100%;min-height:96px;font-family:var(--sans);font-size:.92rem;border:1px solid var(--rule);border-radius:6px;padding:.7rem;resize:vertical}
+.model{font-size:.9rem;background:var(--accent-light);border-radius:6px;padding:.7rem .9rem;margin:.5rem 0}
+.model .lbl{font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:.25rem}
+.keys{display:flex;flex-wrap:wrap;gap:.35rem;margin:.5rem 0}
+.key{font-family:var(--mono);font-size:.66rem;border:1px solid var(--rule);border-radius:999px;padding:.2rem .6rem;cursor:pointer;background:#fff}
+.key.hit{background:var(--green-light);border-color:var(--green);color:var(--green)}
+.scorebig{font-family:var(--serif);font-size:2.6rem;font-weight:600;text-align:center}
+.scoresub{text-align:center;font-family:var(--mono);font-size:.72rem;color:#777;letter-spacing:.06em;margin-bottom:1rem}
+.pbreak{border:1px solid var(--rule);border-radius:8px;overflow:hidden;margin:.6rem 0}
+.pbreak div{display:flex;justify-content:space-between;padding:.5rem .9rem;border-bottom:1px solid var(--rule);font-size:.88rem}
+.pbreak div:last-child{border-bottom:none}.pbreak div b{font-family:var(--mono);font-weight:500}
+.info{background:var(--gold-light);border-left:3px solid var(--gold);border-radius:5px;padding:.8rem 1rem;font-size:.9rem;margin:.7rem 0}
+.note{font-family:var(--mono);font-size:.62rem;color:#999;text-align:center;margin-top:2rem;letter-spacing:.05em}
+@media(max-width:560px){.palette{grid-template-columns:repeat(8,1fr)}}
+</style></head><body>
+<div class="masthead">
+ <div class="eyebrow">M.Sc. · Advanced Computer Architecture &amp; Organisation</div>
+ <h1>CSC808 Study Hub</h1>
+ <div class="brand">Faculty of Computing · Dept. of Computer Science · Presented by Leternal Systems</div>
+ <div class="tabs">
+  <button class="tab active" data-v="cards">Flashcards</button>
+  <button class="tab" data-v="quiz">Quiz</button>
+  <button class="tab" data-v="exam">Exam</button>
+ </div>
+</div>
+<div class="wrap">
+
+ <section id="view-cards" class="view active">
+  <div class="bar" id="cardChips"></div>
+  <div class="bar">
+   <button class="chip" id="modeStudy">Study mode</button>
+   <button class="chip" id="modeQuiz">Quiz me</button>
+   <span class="spacer"></span>
+   <span class="stat" id="cardCount"></span>
+  </div>
+  <div class="progress"><span id="masteryBar"></span></div>
+  <div class="stat" id="masteryTxt" style="margin-bottom:.6rem"></div>
+  <div id="studyArea"></div>
+ </section>
+
+ <section id="view-quiz" class="view">
+  <div class="bar" id="quizChips"></div>
+  <div class="bar"><span class="stat" id="quizLife"></span><span class="spacer"></span>
+   <button class="chip" id="quizReset">Reset lifetime score</button></div>
+  <div id="quizArea"></div>
+ </section>
+
+ <section id="view-exam" class="view">
+  <div id="examArea"></div>
+ </section>
+
+ <div class="note">Open in any browser · works offline · GitHub Pages-ready · progress saved locally on this device</div>
+</div>
+<script>
+const DATA = {"cards": [{"ch": 1, "part": "Introduction", "front": "Computer architecture vs. organization", "back": "Architecture = attributes visible to the programmer affecting logical program execution (ISA, data-type widths, addressing, I/O mechanism). Organization = operational units and interconnections that realize the architecture (control signals, bus widths, memory technology)."}, {"ch": 1, "part": "Introduction", "front": "The four basic functions of a computer", "back": "Data processing, data storage, data movement (I/O & communications), and control."}, {"ch": 1, "part": "Introduction", "front": "The four main structural components", "back": "CPU, main memory, I/O, and system interconnection (e.g., a bus)."}, {"ch": 1, "part": "Introduction", "front": "CPU substructure", "back": "Control unit, ALU, registers, and CPU interconnection."}, {"ch": 1, "part": "Introduction", "front": "Stored-program concept (von Neumann)", "back": "Both program and data are stored in main memory and can be read/modified/executed in sequence, rather than fixed in hardware wiring."}, {"ch": 1, "part": "Introduction", "front": "Moore's Law", "back": "The number of transistors on a chip doubles roughly every 18–24 months; consequences include lower cost/bit, higher speed, lower power, and greater reliability."}, {"ch": 1, "part": "Introduction", "front": "Cloud service models", "back": "SaaS (applications), PaaS (platform/runtime), IaaS (raw compute & storage)."}, {"ch": 2, "part": "Introduction", "front": "Amdahl's Law", "back": "Speedup = 1 / [(1−f) + f/N]. The serial fraction (1−f) caps speedup; as N→∞, speedup→1/(1−f)."}, {"ch": 2, "part": "Introduction", "front": "Little's Law", "back": "L = λW: average number in a stable system = arrival rate × average time spent in the system."}, {"ch": 2, "part": "Introduction", "front": "CPU-time equation", "back": "T = Ic × CPI × τ = (Ic × CPI)/f, where Ic = instruction count, CPI = cycles per instruction, τ = cycle time."}, {"ch": 2, "part": "Introduction", "front": "Which mean for rates vs ratios", "back": "Times → arithmetic mean; rates (fixed work) → harmonic mean; normalized ratios/speedups (e.g., SPEC) → geometric mean."}, {"ch": 2, "part": "Introduction", "front": "SPECspeed vs SPECrate", "back": "SPECspeed measures single-task latency (how fast); SPECrate measures throughput (how many copies in fixed time)."}, {"ch": 3, "part": "Computer System", "front": "Instruction cycle", "back": "Fetch (PC→IR, increment PC) → decode → operand fetch → execute → operand store → interrupt check; repeats until halt."}, {"ch": 3, "part": "Computer System", "front": "Role of PC, IR, MAR, MBR", "back": "PC: address of next instruction; IR: current instruction; MAR: address to access memory; MBR/MDR: data in transit to/from memory."}, {"ch": 3, "part": "Computer System", "front": "Why interrupts exist", "back": "To avoid idle busy-waiting on slow I/O: the CPU does useful work and is signalled when a device needs service, improving efficiency."}, {"ch": 3, "part": "Computer System", "front": "Interrupt classes", "back": "Program (e.g., overflow), timer, I/O, and hardware failure."}, {"ch": 3, "part": "Computer System", "front": "Sequential vs nested interrupts", "back": "Sequential: disable further interrupts while servicing (simple, high-priority waits). Nested: higher-priority interrupt pre-empts current ISR (fast response, more complex)."}, {"ch": 3, "part": "Computer System", "front": "Three groups of bus lines", "back": "Data lines (bandwidth), address lines (capacity/selection), control lines (read/write, ACK, IRQ, clock, arbitration)."}, {"ch": 3, "part": "Computer System", "front": "Why point-to-point replaced shared buses", "back": "Rising clock rates made a shared parallel bus hard to drive (skew, loading, contention). QPI/PCIe use high-speed serial lanes and layered protocols for higher bandwidth and scalability."}, {"ch": 4, "part": "Computer System", "front": "Principle of locality", "back": "Temporal locality (recently used items reused soon) and spatial locality (nearby items used soon) make a small fast cache satisfy most accesses."}, {"ch": 4, "part": "Computer System", "front": "Cache hit vs miss", "back": "Hit: requested block is in cache (served fast). Miss: block fetched from memory into a line (whole block, exploiting spatial locality) then served."}, {"ch": 4, "part": "Computer System", "front": "Three mapping functions", "back": "Direct (one fixed line per block: Tag|Line|Word), Associative (any line: Tag|Word), Set-associative (one set, any line within: Tag|Set|Word)."}, {"ch": 4, "part": "Computer System", "front": "Write-through vs write-back", "back": "Write-through updates cache and memory every write (simple, high traffic). Write-back updates only cache + dirty bit; memory updated on eviction (less traffic, temporarily stale)."}, {"ch": 4, "part": "Computer System", "front": "LRU replacement", "back": "Evict the least-recently-used line; best matches locality. Only needed for associative / set-associative caches (direct mapping has no choice)."}, {"ch": 4, "part": "Computer System", "front": "Average access time", "back": "T_avg = H·T1 + (1−H)(T1+T2); high hit ratio H pulls the average toward the fast cache time T1."}, {"ch": 5, "part": "Computer System", "front": "DRAM vs SRAM", "back": "DRAM stores charge on a capacitor — dense, cheap, needs refresh, used for main memory. SRAM uses a flip-flop — faster, no refresh, larger/costlier, used for cache. Both volatile."}, {"ch": 5, "part": "Computer System", "front": "ROM family", "back": "ROM (mask), PROM (one-time), EPROM (UV-erasable), EEPROM (byte electrically erasable), Flash (block electrically erasable). All non-volatile."}, {"ch": 5, "part": "Computer System", "front": "Hamming check-bit rule", "back": "Need k check bits for m data bits where 2^k ≥ m + k + 1; a non-zero syndrome points to the erroneous bit position (SEC)."}, {"ch": 5, "part": "Computer System", "front": "NOR vs NAND flash", "back": "NOR: fast random read, good for code. NAND: denser, block-oriented, good for mass storage (SSDs, USB drives)."}, {"ch": 5, "part": "Computer System", "front": "DDR DRAM", "back": "Synchronous DRAM that transfers on both clock edges (double data rate); DDR2/3/4 raise bus speed and prefetch depth for more bandwidth."}, {"ch": 6, "part": "Computer System", "front": "Disk access time", "back": "Seek time + rotational latency + transfer time. Average rotational latency = half a revolution."}, {"ch": 6, "part": "Computer System", "front": "CAV vs MZR", "back": "CAV: constant rpm, same sectors per track (simple, wastes outer capacity). MZR: more sectors on outer tracks (higher capacity)."}, {"ch": 6, "part": "Computer System", "front": "RAID 0 vs RAID 1", "back": "RAID 0: striping only — speed/capacity, NO redundancy. RAID 1: mirroring — full redundancy, survives one failure, 50% overhead."}, {"ch": 6, "part": "Computer System", "front": "RAID 5 vs RAID 6", "back": "RAID 5: block striping with distributed parity, tolerates one disk failure. RAID 6: dual distributed parity, tolerates two simultaneous failures."}, {"ch": 6, "part": "Computer System", "front": "SSD wear leveling", "back": "Flash cells endure limited erase cycles; wear leveling spreads writes across cells to extend drive lifetime."}, {"ch": 7, "part": "Computer System", "front": "Three I/O techniques", "back": "Programmed I/O (CPU busy-waits, moves each word), interrupt-driven I/O (interrupt per word, no busy-wait), DMA (controller moves whole block, one interrupt at end)."}, {"ch": 7, "part": "Computer System", "front": "DMA cycle stealing", "back": "The DMA controller borrows bus cycles the CPU is not using to transfer a block directly between device and memory."}, {"ch": 7, "part": "Computer System", "front": "Interrupt-driven I/O vs DMA", "back": "Both avoid busy-waiting, but interrupt-driven still makes the CPU move every word; DMA moves the whole block with no per-word CPU involvement (one interrupt at completion)."}, {"ch": 7, "part": "Computer System", "front": "I/O module functions", "back": "Control & timing, processor communication, device communication, data buffering, error detection."}, {"ch": 9, "part": "Arithmetic & Logic", "front": "Positional value", "back": "Each digit contributes digit × base^position; binary is base-2, hex base-16."}, {"ch": 9, "part": "Arithmetic & Logic", "front": "Hex ↔ binary", "back": "One hex digit = exactly 4 bits; convert by grouping bits in fours from the radix point (no arithmetic needed)."}, {"ch": 9, "part": "Arithmetic & Logic", "front": "Decimal→binary (integer)", "back": "Repeated division by 2; read the remainders from bottom (last) to top (first)."}, {"ch": 10, "part": "Arithmetic & Logic", "front": "Two's complement", "back": "Negative n represented as 2^N − |n| (invert bits and add 1). Single zero; same adder for signed/unsigned; range −2^(N−1) … +2^(N−1)−1."}, {"ch": 10, "part": "Arithmetic & Logic", "front": "Overflow rule (addition)", "back": "Overflow occurs when two operands of the same sign produce a result of the opposite sign."}, {"ch": 10, "part": "Arithmetic & Logic", "front": "Booth's algorithm", "back": "Multiplies two's-complement numbers by inspecting bit pairs (Qi, Qi−1) to add/subtract/shift, skipping runs of identical bits and handling sign directly."}, {"ch": 10, "part": "Arithmetic & Logic", "front": "IEEE 754 single precision", "back": "32 bits = 1 sign + 8 biased exponent (bias 127) + 23 fraction; normalized numbers have an implicit leading 1 (hidden bit)."}, {"ch": 10, "part": "Arithmetic & Logic", "front": "FP addition steps", "back": "Align exponents, add/subtract significands, normalize, round (guard/round/sticky bits)."}, {"ch": 10, "part": "Arithmetic & Logic", "front": "Why biased exponent", "back": "Stored biased (excess) so bit patterns sort in the same order as exponent values, enabling fast magnitude comparison."}, {"ch": 11, "part": "Arithmetic & Logic", "front": "DeMorgan's laws", "back": "(A·B)′ = A′ + B′ and (A + B)′ = A′·B′."}, {"ch": 11, "part": "Arithmetic & Logic", "front": "Functionally complete gates", "back": "NAND alone and NOR alone are each functionally complete — any Boolean function can be built from one of them."}, {"ch": 11, "part": "Arithmetic & Logic", "front": "Combinational vs sequential", "back": "Combinational: output depends only on present inputs (no memory) — adders, MUX, decoders. Sequential: output depends on inputs AND stored state — flip-flops, registers, counters."}, {"ch": 11, "part": "Arithmetic & Logic", "front": "Flip-flop types", "back": "SR (forbidden 1,1), JK (toggles on 1,1), D (captures data on clock edge), T (toggle)."}, {"ch": 11, "part": "Arithmetic & Logic", "front": "Karnaugh map", "back": "Groups adjacent 1-cells in powers of two to eliminate variables, simplifying a Boolean function before implementation."}, {"ch": 11, "part": "Arithmetic & Logic", "front": "PLA vs PAL vs FPGA", "back": "PLA: programmable AND & OR planes. PAL: programmable AND, fixed OR. FPGA: grid of configurable logic blocks + interconnect, field-programmable."}], "mcqs": [{"ch": 1, "part": "Introduction", "q": "Which is an example of a computer ARCHITECTURE attribute?", "opts": ["Whether multiplication uses a dedicated unit or repeated addition", "Whether the instruction set includes a multiply instruction", "The memory technology used for main memory", "The control-signal generation method"], "ans": 1, "exp": "The presence of a multiply instruction is programmer-visible (architecture). How it is implemented is organization."}, {"ch": 1, "part": "Introduction", "q": "The IBM System/360 family is a classic illustration that:", "opts": ["One organization can support many architectures", "One architecture can be realized by many organizations", "Architecture and organization are identical", "Microprogramming is always faster"], "ans": 1, "exp": "The 360 models shared one architecture (portable programs) but differed in organization and price."}, {"ch": 1, "part": "Introduction", "q": "In the von Neumann model, instructions and data are:", "opts": ["Stored in physically separate memories", "Stored together in the same main memory", "Hard-wired into the control unit", "Held only in registers"], "ans": 1, "exp": "The stored-program concept keeps program and data in the same readable/writable memory."}, {"ch": 1, "part": "Introduction", "q": "Which is NOT one of the four basic computer functions?", "opts": ["Data processing", "Data storage", "Data movement", "Data encryption"], "ans": 3, "exp": "The four functions are processing, storage, movement, and control."}, {"ch": 1, "part": "Introduction", "q": "Moore's Law most directly predicts the growth of:", "opts": ["Clock frequency", "Transistors per chip", "Disk capacity", "Network bandwidth"], "ans": 1, "exp": "Moore's Law concerns transistor density doubling on a chip over time."}, {"ch": 1, "part": "Introduction", "q": "IaaS, PaaS, and SaaS are:", "opts": ["RAID levels", "Cloud service models", "Cache write policies", "Bus arbitration schemes"], "ans": 1, "exp": "They are the three standard cloud service models."}, {"ch": 2, "part": "Introduction", "q": "A program is 80% parallelizable. The maximum speedup with infinite processors is:", "opts": ["4×", "5×", "8×", "Unbounded"], "ans": 1, "exp": "Amdahl: limit = 1/(1−f) = 1/0.2 = 5×."}, {"ch": 2, "part": "Introduction", "q": "With f=0.8 and N=4 processors, Amdahl speedup ≈", "opts": ["2.5×", "4.0×", "2.0×", "3.3×"], "ans": 0, "exp": "1/[(0.2)+(0.8/4)] = 1/[0.2+0.2] = 1/0.4 = 2.5×."}, {"ch": 2, "part": "Introduction", "q": "To summarize SPEC performance ratios with one number, use the:", "opts": ["Arithmetic mean", "Harmonic mean", "Geometric mean", "Median"], "ans": 2, "exp": "The geometric mean keeps relative rankings independent of the reference machine."}, {"ch": 2, "part": "Introduction", "q": "The harmonic mean is the correct average for:", "opts": ["Execution times", "Rates over a fixed amount of work", "Normalized speedups", "Cache sizes"], "ans": 1, "exp": "Rates (e.g., MFLOPS) over fixed work are correctly averaged with the harmonic mean."}, {"ch": 2, "part": "Introduction", "q": "In T = Ic × CPI × τ, the cycle time τ equals:", "opts": ["CPI / f", "1 / f", "Ic × f", "f × CPI"], "ans": 1, "exp": "Cycle time is the reciprocal of clock frequency."}, {"ch": 2, "part": "Introduction", "q": "SPECrate primarily measures:", "opts": ["Single-task latency", "Throughput (copies in fixed time)", "Cache hit ratio", "Power consumption"], "ans": 1, "exp": "SPECrate is a throughput metric; SPECspeed is latency."}, {"ch": 2, "part": "Introduction", "q": "The industry turned to multicore chips mainly because:", "opts": ["Software demanded fewer cores", "Single-core gains hit power/ILP limits", "DRAM became free", "Buses were eliminated"], "ans": 1, "exp": "The power wall and limits of instruction-level parallelism drove multicore designs."}, {"ch": 3, "part": "Computer System", "q": "During instruction fetch, the address of the next instruction is held in the:", "opts": ["IR", "MBR", "Program Counter (PC)", "Accumulator"], "ans": 2, "exp": "The PC holds the address of the next instruction to fetch."}, {"ch": 3, "part": "Computer System", "q": "Which register holds the address used to access memory?", "opts": ["IR", "MAR", "PC", "Flags"], "ans": 1, "exp": "The Memory Address Register holds the address for a memory access."}, {"ch": 3, "part": "Computer System", "q": "An interrupt primarily improves:", "opts": ["Memory capacity", "Processor efficiency by avoiding busy-waiting", "Bus width", "Cache size"], "ans": 1, "exp": "Interrupts let the CPU do useful work instead of polling slow devices."}, {"ch": 3, "part": "Computer System", "q": "If a system bus has 24 address lines, the directly addressable space is:", "opts": ["2^16 locations", "2^24 locations", "24 locations", "2^8 locations"], "ans": 1, "exp": "Address capacity = 2^(number of address lines) = 2^24."}, {"ch": 3, "part": "Computer System", "q": "In nested (priority) interrupt handling:", "opts": ["All interrupts are disabled during any ISR", "A higher-priority interrupt can pre-empt the current ISR", "Interrupts are ignored", "Only timer interrupts are allowed"], "ans": 1, "exp": "Nesting allows higher-priority interrupts to interrupt lower-priority ISRs."}, {"ch": 3, "part": "Computer System", "q": "QPI and PCIe replaced shared buses chiefly to provide:", "opts": ["Lower cost only", "Higher bandwidth and scalability via serial lanes", "Simpler wiring with one line", "Non-volatile storage"], "ans": 1, "exp": "Point-to-point serial interconnects scale to far higher bandwidth than a shared parallel bus."}, {"ch": 4, "part": "Computer System", "q": "The cache works because of:", "opts": ["Random memory access patterns", "The principle of locality of reference", "Large register files", "Virtual memory only"], "ans": 1, "exp": "Temporal and spatial locality make a small cache effective."}, {"ch": 4, "part": "Computer System", "q": "In direct mapping, a memory block can be placed in:", "opts": ["Any cache line", "Exactly one cache line", "Any line within one set", "Two specific lines"], "ans": 1, "exp": "Direct mapping forces each block to one specific line (block mod #lines)."}, {"ch": 4, "part": "Computer System", "q": "For a 16-bit address, 4-byte lines, and 64 lines, DIRECT-mapped tag width is:", "opts": ["6 bits", "8 bits", "9 bits", "10 bits"], "ans": 1, "exp": "Word=2, Line=log2(64)=6, Tag=16−6−2=8 bits."}, {"ch": 4, "part": "Computer System", "q": "Which mapping needs NO replacement algorithm?", "opts": ["Fully associative", "Set-associative", "Direct", "2-way set-associative"], "ans": 2, "exp": "Direct mapping has only one candidate line, so there is no choice to make."}, {"ch": 4, "part": "Computer System", "q": "Write-back caching reduces memory traffic by:", "opts": ["Writing to memory on every store", "Updating memory only when a dirty line is evicted", "Never writing to memory", "Disabling the cache"], "ans": 1, "exp": "Write-back defers memory updates until eviction, using a dirty bit."}, {"ch": 4, "part": "Computer System", "q": "For a fixed cache size, increasing associativity generally:", "opts": ["Widens the set field, shrinks the tag", "Shrinks the set field, widens the tag", "Removes the word field", "Has no effect on fields"], "ans": 1, "exp": "Fewer sets (each larger) means fewer set bits and more tag bits."}, {"ch": 5, "part": "Computer System", "q": "DRAM must be periodically refreshed because it:", "opts": ["Uses flip-flops that drift", "Stores charge on capacitors that leaks", "Is non-volatile", "Has no clock"], "ans": 1, "exp": "Capacitor charge leaks, so DRAM cells need periodic refresh."}, {"ch": 5, "part": "Computer System", "q": "Which memory is typically used for cache?", "opts": ["DRAM", "SRAM", "Flash", "Magnetic disk"], "ans": 1, "exp": "SRAM is faster and needs no refresh, making it suitable for cache."}, {"ch": 5, "part": "Computer System", "q": "A SEC Hamming code for 16 data bits needs how many check bits?", "opts": ["4", "5", "6", "8"], "ans": 1, "exp": "2^k ≥ 16+k+1: k=5 gives 32 ≥ 22 ✓ (k=4 gives 16 ≥ 21 ✗)."}, {"ch": 5, "part": "Computer System", "q": "NAND flash is preferred over NOR flash for mass storage because it is:", "opts": ["Faster at random reads", "Denser and block-oriented", "Byte-addressable", "Non-volatile only in NAND"], "ans": 1, "exp": "NAND's density and block organization suit SSDs/USB drives."}, {"ch": 5, "part": "Computer System", "q": "A zero syndrome in a Hamming-coded word indicates:", "opts": ["A double-bit error", "No detected error", "An erased word", "A refresh is due"], "ans": 1, "exp": "A zero syndrome means no single-bit error was detected; non-zero points to the bit position."}, {"ch": 6, "part": "Computer System", "q": "Average rotational latency of a disk equals:", "opts": ["A full revolution", "Half a revolution", "The seek time", "The transfer time"], "ans": 1, "exp": "On average the target sector is half a rotation away."}, {"ch": 6, "part": "Computer System", "q": "Which RAID level provides striping with NO redundancy?", "opts": ["RAID 0", "RAID 1", "RAID 5", "RAID 6"], "ans": 0, "exp": "RAID 0 stripes for performance but tolerates no disk failure."}, {"ch": 6, "part": "Computer System", "q": "Which RAID level tolerates TWO simultaneous disk failures?", "opts": ["RAID 1", "RAID 4", "RAID 5", "RAID 6"], "ans": 3, "exp": "RAID 6 uses dual distributed parity to survive two failures."}, {"ch": 6, "part": "Computer System", "q": "RAID 5 improves on RAID 4 by:", "opts": ["Removing all parity", "Distributing parity across all disks", "Using mirroring", "Doubling capacity"], "ans": 1, "exp": "Distributing parity removes RAID 4's dedicated-parity-disk write bottleneck."}, {"ch": 6, "part": "Computer System", "q": "Magnetic tape is mainly used for:", "opts": ["High random-access workloads", "Low-cost archival backup", "Cache", "Boot firmware"], "ans": 1, "exp": "Tape is serial-access, lowest cost/bit — ideal for archival."}, {"ch": 7, "part": "Computer System", "q": "In programmed I/O the CPU:", "opts": ["Is interrupted once per block", "Busy-waits polling status and moves each word", "Is not involved at all", "Uses a DMA controller"], "ans": 1, "exp": "Programmed I/O polls and transfers each word itself — wasteful for slow devices."}, {"ch": 7, "part": "Computer System", "q": "The key advantage of DMA over interrupt-driven I/O is that DMA:", "opts": ["Avoids busy-waiting", "Transfers a whole block without per-word CPU involvement", "Needs no controller", "Eliminates interrupts entirely"], "ans": 1, "exp": "Interrupt-driven I/O still moves every word; DMA moves the whole block, interrupting once at the end."}, {"ch": 7, "part": "Computer System", "q": "Cycle stealing refers to the DMA controller:", "opts": ["Stealing cache lines", "Borrowing unused bus cycles to transfer data", "Disabling the CPU clock", "Encrypting transfers"], "ans": 1, "exp": "DMA uses bus cycles the CPU is not using to move the block."}, {"ch": 7, "part": "Computer System", "q": "Which is a function of an I/O module?", "opts": ["Refreshing DRAM", "Data buffering and error detection", "Computing parity for RAID", "Branch prediction"], "ans": 1, "exp": "I/O modules buffer data, communicate with CPU and device, time transfers, and detect errors."}, {"ch": 9, "part": "Arithmetic & Logic", "q": "The decimal value of 101101₂ is:", "opts": ["43", "45", "53", "61"], "ans": 1, "exp": "32+8+4+1 = 45."}, {"ch": 9, "part": "Arithmetic & Logic", "q": "101101₂ in hexadecimal is:", "opts": ["0x2D", "0x3D", "0x1B", "0x2F"], "ans": 0, "exp": "Group as 0010 1101 = 2D."}, {"ch": 9, "part": "Arithmetic & Logic", "q": "One hexadecimal digit represents exactly:", "opts": ["2 bits", "3 bits", "4 bits", "8 bits"], "ans": 2, "exp": "16 = 2^4, so each hex digit maps to 4 binary bits."}, {"ch": 10, "part": "Arithmetic & Logic", "q": "The 8-bit two's-complement representation of −20 is:", "opts": ["1110 1100", "0001 0100", "1110 1011", "1001 0100"], "ans": 0, "exp": "Invert 0001 0100 → 1110 1011, add 1 → 1110 1100."}, {"ch": 10, "part": "Arithmetic & Logic", "q": "In two's complement with N bits, the representable range is:", "opts": ["−2^N … 2^N", "0 … 2^N−1", "−2^(N−1) … 2^(N−1)−1", "−2^(N−1)−1 … 2^(N−1)"], "ans": 2, "exp": "Two's complement spans −2^(N−1) to +2^(N−1)−1."}, {"ch": 10, "part": "Arithmetic & Logic", "q": "Addition overflow in two's complement occurs when:", "opts": ["A carry leaves the MSB", "Two same-sign operands give an opposite-sign result", "Any carry is generated", "The result is zero"], "ans": 1, "exp": "Overflow = same-sign operands producing a result of the opposite sign."}, {"ch": 10, "part": "Arithmetic & Logic", "q": "In IEEE 754 single precision the exponent field is:", "opts": ["23 bits, two's complement", "8 bits, biased by 127", "11 bits, biased by 1023", "8 bits, sign-magnitude"], "ans": 1, "exp": "Single precision: 8-bit exponent stored with bias 127."}, {"ch": 10, "part": "Arithmetic & Logic", "q": "The 'hidden bit' in normalized IEEE 754 numbers is:", "opts": ["An implicit leading 1 in the significand", "A parity bit", "The sign bit", "The least significant exponent bit"], "ans": 0, "exp": "Normalized values have an implicit leading 1, giving 24 effective significand bits in single precision."}, {"ch": 10, "part": "Arithmetic & Logic", "q": "IEEE 754 stores the exponent biased rather than in two's complement so that:", "opts": ["It saves a bit", "Bit patterns sort in exponent order for fast comparison", "Rounding is exact", "Zero is unique"], "ans": 1, "exp": "Biased exponents allow magnitude comparison as if integers."}, {"ch": 11, "part": "Arithmetic & Logic", "q": "By DeMorgan's law, (A + B)′ equals:", "opts": ["A′ + B′", "A′ · B′", "A · B", "A + B"], "ans": 1, "exp": "(A+B)′ = A′·B′."}, {"ch": 11, "part": "Arithmetic & Logic", "q": "Which single gate type is functionally complete?", "opts": ["AND", "OR", "NAND", "XOR"], "ans": 2, "exp": "NAND (and NOR) alone can build any Boolean function."}, {"ch": 11, "part": "Arithmetic & Logic", "q": "A circuit whose output depends only on present inputs is:", "opts": ["Sequential", "Combinational", "A flip-flop", "A counter"], "ans": 1, "exp": "No memory ⇒ combinational; memory/state ⇒ sequential."}, {"ch": 11, "part": "Arithmetic & Logic", "q": "Which flip-flop captures its data input on the clock edge?", "opts": ["SR", "JK", "D", "T"], "ans": 2, "exp": "The D flip-flop stores the value of D at the active clock edge."}, {"ch": 11, "part": "Arithmetic & Logic", "q": "A Karnaugh map is used to:", "opts": ["Store sequential state", "Simplify Boolean expressions by grouping adjacent 1s", "Generate clock signals", "Route a bus"], "ans": 1, "exp": "K-maps group adjacent minterms in powers of two to eliminate variables."}, {"ch": 11, "part": "Arithmetic & Logic", "q": "In a PAL device, which plane is programmable?", "opts": ["Both AND and OR", "AND only (OR fixed)", "OR only (AND fixed)", "Neither"], "ans": 1, "exp": "PAL = programmable AND plane, fixed OR plane (PLA has both programmable)."}, {"ch": 11, "part": "Arithmetic & Logic", "q": "The sum output of a full adder is:", "opts": ["A · B · Cin", "A ⊕ B ⊕ Cin", "A + B + Cin", "(A·B)+Cin"], "ans": 1, "exp": "Sum = A XOR B XOR Cin; Cout = AB + Cin(A⊕B)."}, {"ch": 3, "part": "Computer System", "q": "The indirect cycle of the instruction cycle is used to:", "opts": ["Fetch the opcode", "Resolve indirect operand addresses before execution", "Service interrupts", "Refresh DRAM"], "ans": 1, "exp": "The indirect cycle obtains the effective operand address when indirect addressing is used."}, {"ch": 5, "part": "Computer System", "q": "EEPROM differs from EPROM mainly in that EEPROM is:", "opts": ["Volatile", "Erased electrically (in place), not by UV light", "Faster than SRAM", "Used as cache"], "ans": 1, "exp": "EEPROM is electrically erasable in circuit; EPROM requires UV exposure to erase."}, {"ch": 6, "part": "Computer System", "q": "Striping data across multiple disks improves performance by:", "opts": ["Adding parity", "Allowing concurrent (parallel) transfers", "Reducing capacity", "Mirroring data"], "ans": 1, "exp": "Spreading a transfer over several disks lets them work in parallel, multiplying bandwidth."}, {"ch": 7, "part": "Computer System", "q": "After a DMA block transfer completes, the CPU is typically:", "opts": ["Polled continuously", "Interrupted once to be notified", "Never notified", "Reset"], "ans": 1, "exp": "DMA interrupts the CPU only once, at completion of the whole block."}, {"ch": 9, "part": "Arithmetic & Logic", "q": "The binary fraction 0.101₂ equals which decimal value?", "opts": ["0.5", "0.625", "0.75", "0.125"], "ans": 1, "exp": "0.101₂ = 1/2 + 0/4 + 1/8 = 0.5 + 0.125 = 0.625."}], "saqs": [{"ch": 1, "part": "Introduction", "q": "Distinguish computer architecture from computer organization, with one example of each.", "model": "Architecture = attributes visible to the programmer that affect logical program execution (instruction set, data-type widths, addressing modes, I/O command structure). Organization = the operational units and interconnections that realize the architecture and are transparent to the programmer (control signals, bus widths, memory technology, whether a function is hardwired or microprogrammed). Example: the existence of a multiply instruction is architecture; implementing it with a dedicated multiplier vs repeated addition is organization.", "keys": ["visible to programmer", "logical execution", "instruction set", "operational units", "transparent", "multiply example"]}, {"ch": 1, "part": "Introduction", "q": "State the stored-program concept and name the structural components of the von Neumann/IAS machine.", "model": "The stored-program concept holds that the program is stored in main memory alongside its data, so instructions can be fetched, modified, and executed in sequence rather than being fixed in hardware. The IAS/von Neumann machine comprises: a main memory holding instructions and data, an ALU operating on binary data, a control unit that interprets and sequences instructions, and I/O equipment directed by the control unit.", "keys": ["program stored in memory", "with data", "main memory", "ALU", "control unit", "I/O"]}, {"ch": 2, "part": "Introduction", "q": "State Amdahl's Law and explain what it implies about parallel speedup.", "model": "Amdahl's Law: Speedup = 1/[(1−f) + f/N], where f is the fraction of work that can be sped up by factor N. It implies that the serial portion (1−f) bounds the achievable speedup: as N→∞ the speedup approaches 1/(1−f). Thus even massive parallelism gives diminishing returns when a non-trivial fraction of the work is inherently serial.", "keys": ["1/[(1-f)+f/N]", "fraction f", "serial fraction bounds", "1/(1-f)", "diminishing returns"]}, {"ch": 2, "part": "Introduction", "q": "Explain why the geometric mean is used to summarize SPEC results, while times use the arithmetic mean.", "model": "Execution times add meaningfully, so their representative average is the arithmetic mean. SPEC summarizes normalized performance ratios (relative to a reference machine). The geometric mean is the only Pythagorean mean for which the ranking of machines is independent of the reference chosen; using the arithmetic mean on ratios would let the choice of baseline change the ranking. Hence times → arithmetic mean, ratios → geometric mean (and rates over fixed work → harmonic mean).", "keys": ["times arithmetic mean", "ratios", "geometric mean", "reference independent", "ranking"]}, {"ch": 3, "part": "Computer System", "q": "Describe the instruction cycle and the role of the PC and IR.", "model": "The instruction cycle is the repeated fetch–execute process. In fetch, the processor reads the instruction at the address in the Program Counter (PC) into the Instruction Register (IR) and increments the PC. The opcode is decoded, operands are fetched, the operation is executed (possibly with operand store), and the processor then checks for interrupts before the next cycle. The PC tracks the address of the next instruction; the IR holds the instruction currently being executed.", "keys": ["fetch execute", "PC address of next", "IR current instruction", "decode", "increment PC", "interrupt check"]}, {"ch": 3, "part": "Computer System", "q": "Explain interrupt-driven I/O and why interrupts improve efficiency over polling.", "model": "In interrupt-driven I/O the CPU issues an I/O command and continues with other work instead of polling. When the I/O module is ready it raises an interrupt; the CPU suspends its current program, saves context, runs the interrupt service routine to transfer data, restores context, and resumes. This is more efficient than programmed I/O (polling), where the CPU busy-waits and wastes cycles checking a slow device's status.", "keys": ["issue command then continue", "interrupt raised", "service routine", "save/restore context", "avoids busy-waiting"]}, {"ch": 3, "part": "Computer System", "q": "Identify the three groups of bus lines and the function of each.", "model": "Data lines (the data bus) carry the data being transferred; their width (word size) sets bandwidth. Address lines specify the source/destination of data and determine the addressable range. Control lines manage access to and use of the data and address lines, carrying signals such as read/write, acknowledge, interrupt request, clock/timing, and bus request/grant for arbitration.", "keys": ["data lines bandwidth", "address lines capacity", "control lines", "read/write", "interrupt/clock/arbitration"]}, {"ch": 4, "part": "Computer System", "q": "Explain the principle of locality and how the cache exploits it.", "model": "Locality of reference has two forms: temporal locality (a recently accessed item is likely to be accessed again soon) and spatial locality (items near a recently accessed item are likely to be accessed soon). The cache exploits temporal locality by retaining recently used blocks and spatial locality by fetching a whole block (line) on a miss. Because most references then hit in the small fast cache, average access time approaches cache speed while average cost approaches that of main memory.", "keys": ["temporal locality", "spatial locality", "retain recent blocks", "fetch whole block", "average access time"]}, {"ch": 4, "part": "Computer System", "q": "Compare direct, associative, and set-associative cache mapping.", "model": "Direct mapping assigns each memory block to exactly one cache line (line = block mod #lines): cheap, but competing blocks thrash; address = Tag|Line|Word. Associative mapping lets a block occupy any line, compared in parallel: best flexibility/hit ratio but costly hardware; address = Tag|Word. Set-associative mapping is the compromise: the cache is divided into sets, a block maps to one set but any line within it (k-way); address = Tag|Set|Word. Most real caches are set-associative.", "keys": ["direct one line", "thrash", "associative any line", "parallel compare", "set-associative sets", "Tag|Set|Word"]}, {"ch": 4, "part": "Computer System", "q": "Contrast write-through and write-back cache write policies.", "model": "Write-through updates both the cache line and main memory on every write, keeping memory current but generating high memory traffic. Write-back updates only the cache line and sets a dirty bit; main memory is updated later, when the dirty line is evicted. Write-back reduces memory traffic but leaves memory temporarily stale, which complicates coherence in multiprocessor/DMA systems.", "keys": ["write-through both", "high traffic", "write-back cache only", "dirty bit", "update on eviction", "coherence"]}, {"ch": 5, "part": "Computer System", "q": "Compare DRAM and SRAM in technology, refresh, speed, and use.", "model": "DRAM stores each bit as charge on a capacitor: high density and low cost per bit, but the charge leaks so it must be periodically refreshed; it is slower and is used for main memory. SRAM stores each bit in a flip-flop (transistor latch): no refresh needed and faster, but lower density and higher cost per bit; it is used for cache. Both are volatile.", "keys": ["DRAM capacitor", "needs refresh", "main memory", "SRAM flip-flop", "no refresh faster", "cache", "both volatile"]}, {"ch": 5, "part": "Computer System", "q": "Explain how a single-error-correcting Hamming code detects and corrects an error.", "model": "On a write, check (parity) bits are computed over overlapping subsets of the data bits and stored. On a read they are recomputed and XOR-ed with the stored check bits to form a syndrome. A zero syndrome means no error; a non-zero syndrome's value identifies the exact bit position in error, which the hardware flips to correct it. The number of check bits k for m data bits satisfies 2^k ≥ m + k + 1.", "keys": ["check bits over subsets", "syndrome", "zero = no error", "non-zero points to position", "flip the bit", "2^k>=m+k+1"]}, {"ch": 6, "part": "Computer System", "q": "List the components of disk access time and identify which usually dominate.", "model": "Disk access time = seek time (move the head to the correct track) + rotational latency (wait for the target sector to rotate under the head, on average half a revolution) + transfer time (read/write the data as it passes). Seek time and rotational latency, being mechanical, usually dominate, which is why random disk access is far slower than sequential and why SSDs outperform disks on random I/O.", "keys": ["seek time", "rotational latency half revolution", "transfer time", "mechanical dominate", "random slower"]}, {"ch": 6, "part": "Computer System", "q": "Compare RAID 0, RAID 1, RAID 5, and RAID 6 in terms of redundancy and fault tolerance.", "model": "RAID 0 stripes data for maximum performance and capacity but has no redundancy — any single disk failure loses data. RAID 1 mirrors data, surviving a disk failure at 50% capacity overhead. RAID 5 stripes with distributed parity, tolerating one disk failure with low overhead. RAID 6 uses dual distributed parity, tolerating two simultaneous disk failures.", "keys": ["RAID0 striping no redundancy", "RAID1 mirror", "RAID5 distributed parity one failure", "RAID6 dual parity two failures"]}, {"ch": 7, "part": "Computer System", "q": "Compare programmed I/O, interrupt-driven I/O, and DMA.", "model": "Programmed I/O: the CPU issues a command then busy-waits, polling status, and transfers each word itself — simple but wasteful. Interrupt-driven I/O: the CPU issues the command and continues; the module interrupts when ready and the CPU transfers a word per interrupt — no busy-waiting but still per-word CPU work. DMA: a dedicated controller transfers a whole block directly between device and memory using cycle stealing, interrupting the CPU only once at completion — best for high-rate transfers.", "keys": ["programmed busy-wait poll", "interrupt per word no busy-wait", "DMA whole block", "cycle stealing", "one interrupt at end"]}, {"ch": 9, "part": "Arithmetic & Logic", "q": "Convert 45 (decimal) to binary and to hexadecimal, showing your method.", "model": "Decimal→binary by repeated division by 2: 45/2=22 r1, 22/2=11 r0, 11/2=5 r1, 5/2=2 r1, 2/2=1 r0, 1/2=0 r1; reading remainders bottom-to-top gives 101101₂. To hex, group bits in fours from the right: 0010 1101 = 2D₁₆. Check: 2×16+13 = 45.", "keys": ["repeated division by 2", "remainders bottom to top", "101101", "group fours", "2D"]}, {"ch": 10, "part": "Arithmetic & Logic", "q": "Explain two's-complement representation and its advantages over sign-magnitude.", "model": "In two's complement an N-bit negative number n is represented as 2^N − |n| (equivalently, invert the bits and add 1); the most significant bit still indicates sign. Advantages over sign-magnitude: there is a single representation of zero (no +0/−0), and the same adder hardware works for both signed and unsigned addition/subtraction, simplifying the ALU. The range is −2^(N−1) to +2^(N−1)−1.", "keys": ["2^N - |n|", "invert add 1", "single zero", "same adder hardware", "range -2^(N-1)..2^(N-1)-1"]}, {"ch": 10, "part": "Arithmetic & Logic", "q": "Describe the IEEE 754 single-precision format and the purpose of the bias.", "model": "IEEE 754 single precision uses 32 bits: 1 sign bit, an 8-bit exponent, and a 23-bit fraction. Normalized numbers have an implicit leading 1 (hidden bit), giving 24 bits of effective precision. The exponent is stored biased by 127 (excess-127) rather than in two's complement so that the stored bit patterns increase monotonically with the true exponent, allowing floating-point magnitudes to be compared as if they were integers. Reserved exponents encode zero, infinities, and NaN.", "keys": ["32 bits 1 sign 8 exponent 23 fraction", "hidden bit", "bias 127", "monotonic comparison", "special values"]}, {"ch": 11, "part": "Arithmetic & Logic", "q": "State DeMorgan's laws and explain why NAND is functionally complete.", "model": "DeMorgan's laws: (A·B)′ = A′ + B′ and (A + B)′ = A′·B′. NAND is functionally complete because NOT, AND, and OR can all be built from NAND alone: NOT A = A NAND A; AND = NAND followed by a NAND-inverter; OR = (A NAND A) NAND (B NAND B) by DeMorgan. Since {AND, OR, NOT} is complete and all three derive from NAND, any Boolean function can be implemented with NAND gates only.", "keys": ["(AB)'=A'+B'", "(A+B)'=A'B'", "NOT from NAND", "AND and OR from NAND", "any function"]}, {"ch": 11, "part": "Arithmetic & Logic", "q": "Distinguish combinational from sequential circuits, with examples.", "model": "A combinational circuit's outputs depend only on its present inputs; it has no memory and is fully described by a truth table — examples include adders, multiplexers, and decoders. A sequential circuit's outputs depend on present inputs and on stored past state held in memory elements (flip-flops), and it is usually clocked — examples include registers, shift registers, and counters. The presence of a storage/feedback element is the distinguishing feature.", "keys": ["combinational only present inputs", "no memory", "adder MUX decoder", "sequential stored state", "flip-flops clocked", "register counter"]}], "mocks": [{"name": "Mock A", "mcq": [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58], "saq": [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]}, {"name": "Mock B", "mcq": [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49, 51, 53, 55, 57, 59], "saq": [1, 3, 5, 7, 9, 11, 13, 15, 17, 19]}], "chapters": [1, 2, 3, 4, 5, 6, 7, 9, 10, 11], "parts": ["Introduction", "Computer System", "Arithmetic & Logic"]};
+const CHT = {"1": "Ch1 Evolution", "2": "Ch2 Performance", "3": "Ch3 Interconnect", "4": "Ch4 Cache", "5": "Ch5 Internal Mem", "6": "Ch6 External Mem", "7": "Ch7 I/O", "9": "Ch9 Number Sys", "10": "Ch10 Arithmetic", "11": "Ch11 Logic"};
+const $ = s => document.querySelector(s);
+const el = (t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;};
+const esc = s => String(s).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
+function store(k,v){try{if(v===undefined)return JSON.parse(localStorage.getItem('csc808_'+k));localStorage.setItem('csc808_'+k,JSON.stringify(v));}catch(e){return null;}}
+
+/* ---- tab switching ---- */
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+ document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+ document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
+ t.classList.add('active'); $('#view-'+t.dataset.v).classList.add('active');
+});
+
+/* ================= FLASHCARDS ================= */
+let cFilter='all', cMode='study', cIdx=0, cQuiz=null;
+let mastery = store('mastery')||{}; // key: card index -> 'known'|'review'
+function cardPool(){return DATA.cards.map((c,i)=>({...c,i})).filter(c=>cFilter==='all'||c.ch===cFilter);}
+function renderCardChips(){
+ const b=$('#cardChips'); b.innerHTML='';
+ const mk=(lab,val)=>{const c=el('button','chip'+(cFilter===val?' active':''),lab);c.onclick=()=>{cFilter=val;cIdx=0;renderCardChips();drawStudy();};return c;};
+ b.appendChild(mk('All',' all'.trim()));
+ DATA.chapters.forEach(ch=>b.appendChild(mk(CHT[ch],ch)));
+}
+function masteryStats(){
+ const pool=cardPool(); let known=0;
+ pool.forEach(c=>{if(mastery[c.i]==='known')known++;});
+ return {known,total:pool.length};
+}
+function drawMastery(){const s=masteryStats();const pct=s.total?Math.round(100*s.known/s.total):0;
+ $('#masteryBar').style.width=pct+'%';
+ $('#masteryTxt').textContent=`Mastered ${s.known} / ${s.total} (${pct}%)`;}
+$('#modeStudy').onclick=()=>{cMode='study';setCardModeChips();drawStudy();};
+$('#modeQuiz').onclick=()=>{cMode='quiz';setCardModeChips();drawStudy();};
+function setCardModeChips(){$('#modeStudy').classList.toggle('active',cMode==='study');$('#modeQuiz').classList.toggle('active',cMode==='quiz');}
+function drawStudy(){
+ const pool=cardPool(); const area=$('#studyArea'); area.innerHTML='';
+ $('#cardCount').textContent=pool.length+' cards';
+ drawMastery();
+ if(!pool.length){area.appendChild(el('div','info','No cards in this filter.'));return;}
+ if(cIdx>=pool.length)cIdx=0;
+ const c=pool[cIdx];
+ if(cMode==='study'){
+  const fc=el('div','fc'); const inner=el('div','fc-inner');
+  inner.appendChild(el('div','fc-face fc-front',`<div class="lbl">${esc(CHT[c.ch])} · Concept</div><div class="body">${esc(c.front)}</div>`));
+  inner.appendChild(el('div','fc-face fc-back',`<div class="lbl">Answer</div><div class="body">${esc(c.back)}</div>`));
+  fc.appendChild(inner); fc.onclick=()=>fc.classList.toggle('flip'); area.appendChild(fc);
+  area.appendChild(el('div','fc-hint','Tap card to flip · '+(cIdx+1)+' of '+pool.length));
+  const row=el('div','row');
+  const prev=el('button','btn ghost','‹ Prev'); prev.onclick=()=>{cIdx=(cIdx-1+pool.length)%pool.length;drawStudy();};
+  const rev=el('button','btn gold','Needs review'); rev.onclick=()=>{mastery[c.i]='review';store('mastery',mastery);next();};
+  const kn=el('button','btn green','I know this'); kn.onclick=()=>{mastery[c.i]='known';store('mastery',mastery);next();};
+  const nx=el('button','btn ghost','Next ›'); nx.onclick=next;
+  function next(){cIdx=(cIdx+1)%pool.length;drawStudy();}
+  row.append(prev,rev,kn,nx); area.appendChild(row);
+ } else {
+  // quiz-me: card back is answer; 3 distractors are other backs from same chapter (fallback any)
+  if(!cQuiz||cQuiz.i!==c.i){
+   let dis=DATA.cards.map((x,j)=>({...x,i:j})).filter(x=>x.i!==c.i&&x.ch===c.ch);
+   if(dis.length<3)dis=dis.concat(DATA.cards.map((x,j)=>({...x,i:j})).filter(x=>x.i!==c.i&&x.ch!==c.ch));
+   dis=shuffle(dis).slice(0,3);
+   const opts=shuffle([{t:c.back,ok:true},...dis.map(d=>({t:d.back,ok:false}))]);
+   cQuiz={i:c.i,opts,done:false,picked:-1};
+  }
+  const card=el('div','qcard');
+  card.appendChild(el('div','qmeta',esc(CHT[c.ch])+' · identify the correct statement'));
+  card.appendChild(el('div','qtext',esc(c.front)));
+  cQuiz.opts.forEach((o,k)=>{
+   const b=el('button','opt'+(cQuiz.done?(o.ok?' correct':(k===cQuiz.picked?' wrong':' dim')):''),esc(o.t));
+   b.onclick=()=>{if(cQuiz.done)return;cQuiz.done=true;cQuiz.picked=k;if(o.ok){mastery[c.i]='known';store('mastery',mastery);}drawStudy();};
+   card.appendChild(b);
+  });
+  area.appendChild(card);
+  const row=el('div','row');
+  const nx=el('button','btn','Next card'); nx.onclick=()=>{cIdx=(cIdx+1)%pool.length;cQuiz=null;drawStudy();};
+  row.appendChild(nx); area.appendChild(row);
+ }
+}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+/* ================= PRACTICE QUIZ ================= */
+let qFilter='all', qCur=null, qLife=store('qlife')||{right:0,total:0};
+function quizPool(){return DATA.mcqs.map((m,i)=>({...m,i})).filter(m=>qFilter==='all'||m.ch===qFilter);}
+function renderQuizChips(){
+ const b=$('#quizChips'); b.innerHTML='';
+ const mk=(lab,val)=>{const c=el('button','chip'+(qFilter===val?' active':''),lab);c.onclick=()=>{qFilter=val;renderQuizChips();nextQuiz();};return c;};
+ b.appendChild(mk('All',' all'.trim())); DATA.chapters.forEach(ch=>b.appendChild(mk(CHT[ch],ch)));
+}
+function drawLife(){const a=qLife.total?Math.round(100*qLife.right/qLife.total):0;$('#quizLife').textContent=`Lifetime: ${qLife.right}/${qLife.total} (${a}%)`;}
+$('#quizReset').onclick=()=>{qLife={right:0,total:0};store('qlife',qLife);drawLife();};
+function nextQuiz(){
+ const pool=quizPool(); const area=$('#quizArea'); area.innerHTML=''; drawLife();
+ if(!pool.length){area.appendChild(el('div','info','No questions in this filter.'));return;}
+ const m=pool[Math.floor(Math.random()*pool.length)];
+ const order=shuffle(m.opts.map((t,k)=>({t,k})));
+ qCur={m,order,done:false};
+ const card=el('div','qcard');
+ card.appendChild(el('div','qmeta',esc(CHT[m.ch])+' · '+esc(m.part)));
+ card.appendChild(el('div','qtext',esc(m.q)));
+ order.forEach(o=>{
+  const b=el('button','opt',esc(o.t));
+  b.onclick=()=>{if(qCur.done)return;qCur.done=true;
+   const correct=o.k===m.ans;
+   qLife.total++; if(correct)qLife.right++; store('qlife',qLife); drawLife();
+   card.querySelectorAll('.opt').forEach((btn,idx)=>{
+     const oo=order[idx];
+     if(oo.k===m.ans)btn.classList.add('correct');
+     else if(oo.k===o.k)btn.classList.add('wrong'); else btn.classList.add('dim');
+   });
+   card.appendChild(el('div','exp',`<div class="lbl">${correct?'Correct':'Explanation'}</div>${esc(m.exp)}`));
+  };
+  card.appendChild(b);
+ });
+ area.appendChild(card);
+ const row=el('div','row'); const nx=el('button','btn','Next question'); nx.onclick=nextQuiz; row.appendChild(nx); area.appendChild(row);
+}
+
+/* ================= EXAM ================= */
+let exam=null, examTimer=null;
+function examIntro(){
+ const a=$('#examArea'); a.innerHTML='';
+ a.appendChild(el('div','info',
+  '<b>Timed mock examination.</b><br>Each mock has 40 questions (30 multiple-choice + 10 short-answer). '+
+  'Allowance ≈ 80 seconds per question. Multiple-choice are auto-marked; short-answer questions are '+
+  '<b>self-marked</b> against a model answer and keyword checklist after submission. Use the question palette to navigate and flag.'));
+ const row=el('div','row');
+ DATA.mocks.forEach((mk,mi)=>{
+  const b=el('button','btn'+(mi?' gold':''),`Start ${esc(mk.name)} — ${mk.mcq.length+mk.saq.length} Q`);
+  b.onclick=()=>startExam(mi); row.appendChild(b);
+ });
+ a.appendChild(row);
+ const last=store('examlast');
+ if(last)a.appendChild(el('div','stat',`Last attempt: ${esc(last.name)} — MCQ ${last.mcqRight}/${last.mcqTotal}, self-marked SAQ ${last.saqRight}/${last.saqTotal} · ${last.pct}%`));
+}
+function startExam(mi){
+ const mk=DATA.mocks[mi];
+ const items=[];
+ mk.mcq.forEach(idx=>{const m=DATA.mcqs[idx];items.push({type:'mcq',ch:m.ch,part:m.part,q:m.q,opts:m.opts,ans:m.ans,exp:m.exp,order:shuffle(m.opts.map((t,k)=>({t,k}))),pick:-1});});
+ mk.saq.forEach(idx=>{const s=DATA.saqs[idx];items.push({type:'saq',ch:s.ch,part:s.part,q:s.q,model:s.model,keys:s.keys,text:'',self:null});});
+ exam={mi,name:mk.name,items,cur:0,flag:{},submitted:false,remain:items.length*80};
+ tickStart(); drawExam();
+}
+function tickStart(){clearInterval(examTimer);examTimer=setInterval(()=>{if(exam.submitted)return;exam.remain--;updTimer();if(exam.remain<=0){clearInterval(examTimer);submitExam();}},1000);}
+function fmt(s){const m=Math.floor(s/60),x=s%60;return (m<10?'0':'')+m+':'+(x<10?'0':'')+x;}
+function updTimer(){const t=$('#examTimer');if(!t)return;t.textContent=fmt(exam.remain);t.className='timer'+(exam.remain<300?' crit':exam.remain<600?' warn':'');}
+function drawExam(){
+ const a=$('#examArea'); a.innerHTML='';
+ const top=el('div','bar');
+ top.appendChild(el('span','qmeta',`${esc(exam.name)} · Q${exam.cur+1} of ${exam.items.length}`));
+ top.appendChild(el('span','spacer'));
+ const tm=el('span','timer'); tm.id='examTimer'; top.appendChild(tm); a.appendChild(top); updTimer();
+ // palette
+ const pal=el('div','palette');
+ exam.items.forEach((it,i)=>{
+  const answered = it.type==='mcq'?it.pick>=0:(it.text&&it.text.trim().length>0);
+  const c=el('div','pcell'+(answered?' answered':'')+(exam.flag[i]?' flagged':'')+(i===exam.cur?' current':''),(i+1));
+  c.onclick=()=>{exam.cur=i;drawExam();}; pal.appendChild(c);
+ });
+ a.appendChild(pal);
+ // question
+ const it=exam.items[exam.cur];
+ const card=el('div','qcard');
+ card.appendChild(el('div','qmeta',`${esc(CHT[it.ch])} · ${esc(it.part)} · ${it.type==='mcq'?'Multiple choice':'Short answer'}`));
+ card.appendChild(el('div','qtext',esc(it.q)));
+ if(it.type==='mcq'){
+  it.order.forEach(o=>{
+   const b=el('button','opt'+(it.pick===o.k?' correct':''),esc(o.t));
+   b.onclick=()=>{it.pick=o.k;drawExam();}; card.appendChild(b);
+  });
+ } else {
+  const ta=el('textarea','saq-input'); ta.value=it.text||''; ta.placeholder='Write your answer here…';
+  ta.oninput=()=>{it.text=ta.value;}; card.appendChild(ta);
+ }
+ a.appendChild(card);
+ const row=el('div','row');
+ const prev=el('button','btn ghost','‹ Prev'); prev.disabled=exam.cur===0; prev.onclick=()=>{exam.cur--;drawExam();};
+ const flag=el('button','btn gold',exam.flag[exam.cur]?'Unflag':'Flag'); flag.onclick=()=>{exam.flag[exam.cur]=!exam.flag[exam.cur];drawExam();};
+ const nx=el('button','btn ghost','Next ›'); nx.disabled=exam.cur===exam.items.length-1; nx.onclick=()=>{exam.cur++;drawExam();};
+ const sub=el('button','btn red','Submit exam'); sub.onclick=()=>{if(confirm('Submit and end the exam?'))submitExam();};
+ row.append(prev,flag,nx,el('span','spacer'),sub); a.appendChild(row);
+}
+function submitExam(){
+ exam.submitted=true; clearInterval(examTimer); drawResults();
+}
+function drawResults(){
+ const a=$('#examArea'); a.innerHTML='';
+ let mcqRight=0,mcqTotal=0;
+ const partAgg={}; DATA.parts.forEach(p=>partAgg[p]={right:0,total:0});
+ exam.items.forEach(it=>{if(it.type==='mcq'){mcqTotal++;const ok=it.pick===it.ans;if(ok)mcqRight++;partAgg[it.part].total++;if(ok)partAgg[it.part].right++;}});
+ // SAQ self marks counted after user marks; recompute live
+ function saqStats(){let r=0,t=0;exam.items.forEach(it=>{if(it.type==='saq'){t++;if(it.self===true)r++;}});return{r,t};}
+ const ss=saqStats();
+ const combinedRight=mcqRight+ss.r, combinedTotal=mcqTotal+ss.t;
+ const pct=combinedTotal?Math.round(100*combinedRight/combinedTotal):0;
+ a.appendChild(el('div','scorebig',pct+'%'));
+ a.appendChild(el('div','scoresub',`${esc(exam.name)} · MCQ ${mcqRight}/${mcqTotal} · SAQ self-marked ${ss.r}/${ss.t} · time left ${fmt(Math.max(0,exam.remain))}`));
+ // per-part (MCQ-based, objective)
+ const pb=el('div','pbreak');
+ DATA.parts.forEach(p=>{const o=partAgg[p];const pc=o.total?Math.round(100*o.right/o.total):'—';pb.appendChild(el('div',null,`<span>${esc(p)} (MCQ)</span><b>${o.right}/${o.total} ${o.total?'· '+pc+'%':''}</b>`));});
+ a.appendChild(pb);
+ a.appendChild(el('div','info','Review every question below. For short-answer questions, compare with the model answer, tap the keywords you covered, then mark your response <b>correct</b> or <b>missed</b> — your self-marks update the score above.'));
+ // review list
+ exam.items.forEach((it,i)=>{
+  const card=el('div','qcard');
+  card.appendChild(el('div','qmeta',`Q${i+1} · ${esc(CHT[it.ch])} · ${it.type==='mcq'?'MCQ':'SAQ'}`));
+  card.appendChild(el('div','qtext',esc(it.q)));
+  if(it.type==='mcq'){
+   it.opts.forEach((t,k)=>{
+    let cls='opt'; if(k===it.ans)cls+=' correct'; else if(k===it.pick)cls+=' wrong'; else cls+=' dim';
+    card.appendChild(el('div',cls,esc(t)));
+   });
+   card.appendChild(el('div','exp',`<div class="lbl">${it.pick===it.ans?'Correct':(it.pick<0?'Not answered':'Incorrect')}</div>${esc(it.exp)}`));
+  } else {
+   card.appendChild(el('div','model',`<div class="lbl">Your answer</div>${it.text&&it.text.trim()?esc(it.text):'<i>(blank)</i>'}`));
+   card.appendChild(el('div','model',`<div class="lbl">Model answer</div>${esc(it.model)}`));
+   const keys=el('div','keys');
+   it.keys.forEach(kw=>{const txt=(it.text||'').toLowerCase();const auto=txt.includes(kw.toLowerCase().split(' ')[0]);
+    const k=el('span','key'+(it._hit&&it._hit[kw]?' hit':''),esc(kw));
+    k.onclick=()=>{it._hit=it._hit||{};it._hit[kw]=!it._hit[kw];k.classList.toggle('hit');};
+    keys.appendChild(k);});
+   card.appendChild(el('div','qmeta','Keywords — tap those you covered:')); card.appendChild(keys);
+   const row=el('div','row');
+   const ok=el('button','btn green'+(it.self===true?'':' ghost'),'Mark correct');
+   const no=el('button','btn red'+(it.self===false?'':' ghost'),'Mark missed');
+   ok.onclick=()=>{it.self=true;drawResults();}; no.onclick=()=>{it.self=false;drawResults();};
+   row.append(ok,no); card.appendChild(row);
+  }
+  a.appendChild(card);
+ });
+ const row=el('div','row');
+ const again=el('button','btn','Back to exam menu'); again.onclick=()=>{examIntro();};
+ row.appendChild(again); a.appendChild(row);
+ store('examlast',{name:exam.name,mcqRight,mcqTotal,saqRight:ss.r,saqTotal:ss.t,pct});
+}
+
+/* init */
+renderCardChips(); setCardModeChips(); drawStudy();
+renderQuizChips(); nextQuiz();
+examIntro();
+</script></body></html>
